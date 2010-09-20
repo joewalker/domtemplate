@@ -4,6 +4,7 @@ About DomTemplate
 
 DomTemplate is yet another template engine. Rather than doing templating using
 string manipulation, it uses the DOM directly for several reasons:
+
 * It allows you to register event handers as part of the template process
   without needing an extra lookup step
 * It can inform you of references to created nodes to save on lookup steps
@@ -22,6 +23,7 @@ or any CommonJS environment. It works for me, but isn't properly tested or
 documented etc. Contact me if you want to know more.
 
 Things to be wary of:
+
 * So far DomTemplate has has lots of exercise on modern browsers, but not much
   exposure to older browsers. This will probably change if people find it
   useful - there's nothing too fancy going on so it ought to just work.
@@ -49,6 +51,7 @@ This would convert the DOM as follows:
 
 DomTemplate engine has a number of features to help applying arbitrary data to
 your page:
+
 * Nested data and arbitrary Javascript (${a.b.c})
 * Registration of event handlers (onClick="${function}")
 * Conditional evaluation (if="${condition}")
@@ -134,6 +137,7 @@ syntax:
     <div onclick="${clickHandler}" captureonfocus="true">...
 
 There are 2 things to be aware of:
+
 * Although it looks like we are using DOM level 0 event registration (i.e.
   element.onfoo = somefunc) we are actually using DOM level 2, by stripping
   off the 'on' prefix and then using addEventListener('foo', ...). This could
@@ -282,6 +286,7 @@ prefixed with _, please contact me.
 
 Future and Questions
 --------------------
+
 * We're doing something technically nasty in using custom attribute names which
   could have future meaning to a browser. We could consider an alternate
   implementation that uses HTML5 data-attributes.
