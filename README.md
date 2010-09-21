@@ -2,7 +2,7 @@
 About DomTemplate
 =================
 
-**Version**: 0.1 (22 September 2010)  
+**Version**: 0.1 (23 September 2010)  
 **Author**: Joe Walker [ joe at getahead dot org ]  
 **License**: Mozilla tri-license: MPL/GPL/LGPL  
 
@@ -39,13 +39,16 @@ Things to be wary of:
 * So far DomTemplate has had good exercise on modern browsers, but not much
   exposure to older browsers, particularly IE6. This will probably change if
   people find it useful.
-* The API is currently object based (i.e. new Template().processNode()) rather
-  than static (i.e. Template.processNode()). This is mostly for historical
-  reasons. It might make sense to change it if DomTemplate gets significant
-  interest.
 * We're doing something technically nasty in using custom attribute names which
   could have future meaning to a browser. We could consider an alternate
   implementation that uses HTML5 data-attributes.
+* The API is currently object based (i.e. new Template().processNode()) rather
+  than static (i.e. Template.processNode()). This is mostly for historical
+  reasons. It might make sense to change it if DomTemplate gets significant
+  interest. Opinions welcome.
+* We should probably add a helper method to clone the template node and run the
+  template process on the clone, so far there have been various different ways
+  to do this, so I need to work out a consensus.
 
 
 Using The DomTemplate Engine
