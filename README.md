@@ -4,7 +4,7 @@ About DomTemplate
 
 **Version**: 0.1 (22 September 2010)  
 **Author**: Joe Walker [ joe at getahead dot org ]  
-**License**: Apache v2  
+**License**: Mozilla tri-license: MPL/GPL/LGPL  
 
 DomTemplate is yet another template engine. Rather than doing templating using
 string manipulation, it uses the DOM directly for several reasons:
