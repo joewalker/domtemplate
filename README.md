@@ -76,7 +76,7 @@ your page:
 * Nested data and arbitrary Javascript (${a.b.c})
 * Registration of event handlers (onClick="${function}")
 * Conditional evaluation (if="${condition}")
-* Looping (<loop> and foreach="page in ${pages}")
+* Looping (loop and foreach="page in ${pages}")
 * Getting references to cloned nodes (save="${element}")
 * Grabbing the current node (${__element})
 * Hidden nodes (_src="${...}")
@@ -143,7 +143,7 @@ it, so you have access to all your data:
       this.name = name;
       new Templater().processNode('id', this);
     }
-    Thing.prototype = {
+    Person.prototype = {
       clickHandler: function(ev) {
         console.log('You clicked on ' + this.name);
       }
@@ -157,7 +157,7 @@ syntax:
 
     <div onclick="${clickHandler}" captureonfocus="true">...
 
-There are 2 things to be aware of:
+Something to be aware of:
 
 * Although it looks like we are using DOM level 0 event registration (i.e.
   element.onfoo = somefunc) we are actually using DOM level 2, by stripping
@@ -184,7 +184,7 @@ In the second example, the entire 'p' element has been removed by processing
 the if attribute.
 
 
-Looping (<loop> and foreach="page in ${pages}")
+Looping (loop and foreach="page in ${pages}")
 -----------------------------------------------
 
 If an element contains a `foreach` attribute, then that element will be repeated
@@ -244,7 +244,7 @@ This is useful whenever you need to work with the created nodes.
     </div>
     
     templater.processNode('id', data); // data as above
-    people[0].nameElement.className = "highlight";
+    console.log(people[1].nameElement.innerHTML);  // "Sherlock";
 
 
 Grabbing the current node (${__element})
@@ -260,14 +260,15 @@ For example:
 
     templater.processNode('foo'); // logs 'bar' to the console.
 
-Slightly less contrived (but only slightly), this could be used when the data
-might need to be fetched asynchronously:
+Slightly less contrived, this could be used when the data might need to be
+fetched asynchronously:
 
-    <div id="id">${loadName(__element)}</div>
+    <div id="id">${loadData(__element)}</div>
     
+    var data;
     templater.processNode('id', {
-      loadName: function(element) {
-        if (data !== null) return data;
+      loadData: function(element) {
+        if (data) return data;
         fetchData(function(reply) {
           data = reply;
           element.innerHTML = data;
@@ -287,7 +288,7 @@ process will remove the _.
 
 For example:
 
-  <img src="${path}/thing.png"/>
+    <img src="${path}/thing.png"/>
 
 This will the processed, and (assuming 'path' is correctly set) the right image
 will be displayed, however you may notice your browser giving a 404 message from
@@ -297,9 +298,10 @@ process had a chance to substitute the correct path.
 To solve the problem, and have the browser only attempt to fetch the image when
 the correct path has been specified, do the following
 
-  <img _src="${path}/thing.png"/>
+    <img _src="${path}/thing.png"/>
 
 Should you wish to have an attribute in the resulting document prefixed with an
 underscore, simply begin your attribute name with 2 underscores. (Is this a
 common scenario? If you know of another scenario where attribute names are
 prefixed with _, please contact me.
+
