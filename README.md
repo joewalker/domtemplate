@@ -2,7 +2,7 @@
 About DomTemplate
 =================
 
-**Version**: 0.1 (23 September 2010)  
+**Version**: 0.2 (26 August 2011)  
 **Author**: Joe Walker [ joe at getahead dot org ]  
 **License**: Mozilla tri-license: MPL/GPL/LGPL  
 
