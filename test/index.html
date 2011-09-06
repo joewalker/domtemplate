@@ -4,10 +4,7 @@
   <title>DOM TEST</title>
   <meta charset="utf-8"/>
   <script src="../lib/domtemplate.js"></script>
-  <script src="unittest.js"></script>
-  <style>
-    body { max-width: 40em; margin: 10px auto; font-family: Calibri, serif; }
-  </style>
+  <script src="../lib/promise.js"></script>
   <script>
   var $ = function(id) { return document.getElementById(id); };
   console.log('start');
@@ -18,65 +15,65 @@
 <div id="ex1">${nested.value}</div>
 <script>
 new Templater().processNode('ex1', { nested:{ value:'pass 1' } });
-assertEqual('pass 1', $('ex1').innerHTML);
-</script>    
+console.assert('pass 1' === $('ex1').innerHTML, 'ex1 failed');
+</script>
 
 <div id="ex2">${document.createTextNode('pass 2')}</div>
 <script>
 new Templater().processNode('ex2');
-assertEqual("pass 2", $('ex2').innerHTML);
-</script>    
+console.assert("pass 2" === $('ex2').innerHTML, 'ex2 failed');
+</script>
 
 <img id="ex3" _src="${src}" onload="${handler}">
 <script>
 new Templater().processNode('ex3', {
   src: 'green.png',
   handler: function(ev) {
-    assertTrue($('ex3').src.indexOf('green.png') > 0);
+    console.assert($('ex3').src.indexOf('green.png') > 0, 'ex3 failed');
   }
 });
-</script>    
+</script>
 
-<div id="ex4"><P if="${name !== null}">testing: ${name}</P></div>
+<div id="ex4"><p if="${name !== null}">testing: ${name}</p></div>
 <script>
 new Templater().processNode('ex4', { name: 'pass 4' });
-assertEqual("<P>testing: pass 4</P>", $('ex4').innerHTML);
+console.assert("<p>testing: pass 4</p>" === $('ex4').innerHTML, 'ex4 failed');
 </script>
 
 <div id="ex5"><p if="${name}">testing: ${name}</p></div>
 <script>
 new Templater().processNode('ex5', { });
-assertEqual('', $('ex5').innerHTML);
+console.assert('' === $('ex5').innerHTML, 'ex5 failed');
 </script>
 
-<div id="ex6"><P foreach="index in ${[ 1, 2, 3 ]}">${index}</P></div>
+<div id="ex6"><p foreach="index in ${[ 1, 2, 3 ]}">${index}</p></div>
 <script>
 new Templater().processNode('ex6');
-assertEqual('<P>1</P><P>2</P><P>3</P>', $('ex6').innerHTML);
+console.assert('<p>1</p><p>2</p><p>3</p>' === $('ex6').innerHTML, 'ex6 failed');
 </script>
 
 <div id="ex7"><loop foreach="index in ${[ 1, 2, 3 ]}">${index}</loop></div>
 <script>
 new Templater().processNode('ex7');
-assertEqual('123', $('ex7').innerHTML);
+console.assert('123' === $('ex7').innerHTML, 'ex7 failed');
 </script>
 
 <div id="ex8"><p save="${element}">${name}</p></div>
 <script>
 var data = { name: 'pass 8' };
 new Templater().processNode('ex8', data);
-assertEqual('pass 8', data.element.innerHTML);
+console.assert('pass 8' === data.element.innerHTML, 'ex8 failed');
 </script>
 
-<div id="ex9"><P id="pass9">${adjust(__element)}</P></div>
+<div id="ex9"><p id="pass9">${adjust(__element)}</p></div>
 <script>
 new Templater().processNode('ex9', {
   adjust: function(element) {
-    assertEqual('pass9', element.id);
+    console.assert('pass9' === element.id, 'ex9a failed');
     return 'pass 9b'
   }
 });
-assertEqual('<P id="pass9">pass 9b</P>', $('ex9').innerHTML);
+console.assert('<p id="pass9">pass 9b</p>' === $('ex9').innerHTML, 'ex9b failed');
 </script>
 
 </body>
