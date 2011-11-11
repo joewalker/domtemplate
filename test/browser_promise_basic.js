@@ -130,7 +130,7 @@ function testChain() {
   member2 = new Promise();
   member3 = new Promise();
   laterGroup = Promise.group(member1, member2, member3);
-  laterGroup.then(testlaterGroup, fail);
+  laterGroup.then(testLaterGroup, fail);
 
   member1.then(function(data) {
     is(data, "member1", "member1 is member1");
@@ -155,7 +155,7 @@ function testChain() {
 
 var tidyGroup;
 
-function testlaterGroup(data) {
+function testLaterGroup(data) {
   is(data[0], "member1", "member1 is member1");
   is(data[1], "member2", "member2 is member2");
   is(data[2], "member3", "member3 is member3");
