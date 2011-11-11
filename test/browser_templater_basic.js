@@ -205,6 +205,16 @@ var tests = [
     },
     result: '<span></span>',
     later: '<p>4</p><p>5</p><p>6</p>'
+  };},
+
+  // Bug 701762: DOMTemplate fails when ${foo()} returns undefined
+  function() { return {
+    name: 'asyncBoth',
+    template: '<p>${foo()}</p>',
+    data: {
+      foo: function() {}
+    },
+    result: '<p>undefined</p>'
   };}
 ];
 
