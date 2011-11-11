@@ -4,6 +4,7 @@
 // Tests that the DOM Template engine works properly
 
 Cu.import("resource:///modules/devtools/Templater.jsm");
+Cu.import("resource:///modules/devtools/Promise.jsm");
 
 function test()
 {
