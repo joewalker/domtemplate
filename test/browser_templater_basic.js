@@ -135,7 +135,6 @@ var tests = [
 
   // Bug 692028: DOMTemplate memory leak with asynchronous arrays
   // Bug 692031: DOMTemplate async loops do not drop the loop element
-  //*
   function() { return {
     name: 'asyncLoopElement',
     template: '<loop foreach="i in ${array}">${i}</loop>',
@@ -143,7 +142,6 @@ var tests = [
     result: '<span></span>',
     later: '123'
   };},
-  //*/
 
   function() { return {
     name: 'saveElement',
@@ -177,7 +175,6 @@ var tests = [
   };},
 
   // Bug 692028: DOMTemplate memory leak with asynchronous arrays
-  //*
   function() { return {
     name: 'asyncArray',
     template: '<p foreach="i in ${delayed}">${i}</p>',
@@ -185,7 +182,6 @@ var tests = [
     result: '<span></span>',
     later: '<p>1</p><p>2</p><p>3</p>'
   };},
-  //*/
 
   function() { return {
     name: 'asyncMember',
@@ -196,7 +192,6 @@ var tests = [
   };},
 
   // Bug 692028: DOMTemplate memory leak with asynchronous arrays
-  //*
   function() { return {
     name: 'asyncBoth',
     template: '<p foreach="i in ${delayed}">${i}</p>',
@@ -210,7 +205,6 @@ var tests = [
     result: '<span></span>',
     later: '<p>4</p><p>5</p><p>6</p>'
   };}
-  //*/
 ];
 
 function delayReply(data) {
