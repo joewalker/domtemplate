@@ -2,12 +2,10 @@
 About DomTemplate
 =================
 
-**Version**: 0.2 (26 August 2011)  
-**Author**: Joe Walker [ joe at getahead dot org ]  
-**License**: Mozilla tri-license: MPL/GPL/LGPL  
+DomTemplate is yet another template engine.
 
-DomTemplate is yet another template engine. Rather than doing templating using
-string manipulation, it uses the DOM directly for several reasons:
+Rather than doing templating using string manipulation, it uses the DOM
+directly for several reasons:
 
 * It allows you to register event handers as part of the template process
   without needing an extra lookup step
@@ -16,59 +14,22 @@ string manipulation, it uses the DOM directly for several reasons:
   manipulation
 * Since the templates are as close to HTML as possible, they are manipulable
   along with other parts of your website. This makes test/preview easy.
+* It allows for asynchronous templating.
 
 This implementation is also small (around a couple of hundred lines without
-comments) and it is used in Mozilla Bespin/Skywriter and in some of the (as yet
-unreleased) Firefox developer tools, so it should be well supported.
+comments) and it is used in Mozilla Bespin/Skywriter and in some of the Firefox
+developer tools, so it should be well supported.
 
 See below for full usage. However if all you need is a taste:
 
-    <div id="hello">${contents}</div>
+    <div id="ex1">${contents}</div>
                    +
-    new Templater().processNode('hello', { contents:'world' });
-                   |
-                   V
-    <div id="hello">world</div>
+    template('ex2', { contents:'world' });
+                   ↓
+    <div id="ex1">world</div>
 
-I have a hack that will allow you to run DomTemplate on the server in node.js
-or any CommonJS environment. It works for me, but isn't properly tested or
-documented etc. Contact me if you want to know more.
-
-Things to be wary of:
-
-* So far DomTemplate has had good exercise on modern browsers, but not much
-  exposure to older browsers, particularly IE6. This will probably change if
-  people find it useful.
-* We're doing something technically nasty in using custom attribute names which
-  could have future meaning to a browser. We could consider an alternate
-  implementation that uses HTML5 data-attributes.
-* The API is currently object based (i.e. new Template().processNode()) rather
-  than static (i.e. Template.processNode()). This is mostly for historical
-  reasons. It might make sense to change it if DomTemplate gets significant
-  interest. Opinions welcome.
-* We should probably add a helper method to clone the template node and run the
-  template process on the clone, so far there have been various different ways
-  to do this, so I need to work out a consensus.
-
-
-Using The DomTemplate Engine
-============================
-
-DomTemplate works on nodes that already exist in your browser. It applies given
-values to a set of elements.
-
-An example template could look like this:
-
-    <div id="hello">${contents}</div>
-
-This would then be used as follows:
-
-    var data = { contents:'world' };
-    new Templater().processNode('hello', data);
-
-This would convert the DOM as follows:
-
-    <div id="hello">world</div>
+DomTemplate can be run on the server on the server in NodeJS using [jsdom]
+(https://github.com/tmpvar/jsdom).
 
 DomTemplate engine has a number of features to help applying arbitrary data to
 your page:
@@ -78,35 +39,73 @@ your page:
 * Conditional evaluation (if="${condition}")
 * Looping (loop and foreach="page in ${pages}")
 * Getting references to cloned nodes (save="${element}")
+* Hidden attributes (_src="${...}")
+* Asynchronous Templates
 * Grabbing the current node (${__element})
-* Hidden nodes (_src="${...}")
+
+Things to be wary of:
+
+* So far DomTemplate has had good exercise on modern browsers, but not much
+  exposure to older browsers, particularly IE6. This will probably change if
+  people find it useful.
+* We're doing something technically nasty in using custom attribute names which
+  could have future meaning to a browser. We could consider an alternate
+  implementation that uses HTML5 data-attributes.
+
+
+Using DomTemplate
+-----------------
+
+The signature of the template() function is as follows:
+
+    var t = template(node, data, options);
+
+Where:
+
+* _node_ Either a string which points to an element with that id, or the
+  element itself.
+* _data_ A JavaScript object containing the properties to be used as the
+  'global' object for ``${...}`` blocks.
+* _options_ A JavaScript object containing options which customize how the
+  templates are processed. Options include:
+  * _allowEval_ Allow arbitrary JavaScript inside ``${...}`` blocks in addition
+    to property paths. Allowing use of eval() can significantly slow down
+    JavaScript processing.
+
+The return value is the Templater object used to process the template.
 
 
 Nested data and arbitrary Javascript (${a.b.c})
 -----------------------------------------------
 
-The data used in the template does not have to be at the 'top level':
+``${...}`` blocks can be in attribute values and in HTML content. When used in
+an attribute value, the retrieved data is converted to a string before being
+added to the DOM.
+When used in element content, ``${...}`` blocks can return either strings
+(which will be added to the DOM inside a TextNode (i.e. with HTML escaped) or
+they can return DOM elements, in which case the DOM element will be added to
+the tree.
 
-    <div>${nested.value}</div>
-    
-    new Templater().processNode(div, { nested:{ value:42 } }); // <div>42</div>
+The data passed to the template can contain nested data, which is then accessed
+using a familiar property path:
 
-Any ${} element will be processed as a portion of Javascript, in the context of
-the second argument passed to `processNode()` (In the example above the
-context would be `{ nested:{ value:42 } }`)
+    <div id="ex2">${a.b.c}</div>
+                   +
+    template('ex2', { a: { b: { c: 42 } });
+                   ↓
+    <div id="ex2">42</div>
 
-`${...}` can show up in elements and in HTML content. A `${...}` block contains
-arbitrary Javascript. Generally however it is recommended to stick to a dot path
-from an attribute passed to the template.
-
-It expected that `${...}` blocks will return strings when used in an attribute.
-When used in HTML content, `${...}` blocks can return either strings (which will
-be added to the DOM inside a TextNode (i.e. with HTML escaped) or they can
-return DOM elements, in which case the DOM element will be added to the tree.
+Normally any ${} element will be processed as a property path (that is a set of
+properties separated by '.') However DomTemplate also supports using arbitrary
+JavaScript inside ``${}``, when the ``{ allowEval:true }`` option is used.
 
 As an example, this is possible
 
-    <div>${console.log('hi'); document.createTextNode('BANG!')}</div>
+    <div id="ex3">${console.log('hi'); document.createTextNode('BANG!')}</div>
+                   +
+    template('ex2', null, { allowEval:true });
+                   ↓
+    <div id="ex2">BANG!</div>
 
 In the real world doing this kind of thing often leads to pain down the road,
 however it can be a useful get-out-of-jail-free card.
@@ -121,14 +120,15 @@ function.
 
 Example:
 
-    <div onclick="${clickHandler}>Hello</div>
-
-    var data = {
+    <div id="ex4" onclick="${clickHandler}>Hello</div>
+                   +
+    template('ex4', {
       clickHandler:function(ev) {
         console.log('div clicked');
       }
-    };
-    new Templater().processNode(div, data);
+    });
+                   ↓
+    <div id="ex4" onclick=[the clickHandler function]>Hello</div>
 
 Here we are registering an onClick handler for the div. Any type of event
 handler can be registered.
@@ -137,17 +137,19 @@ This is particularly handy when `this` is used as the data to the template
 engine. We make sure that the context of the function is the object that called
 it, so you have access to all your data:
 
-    <div id='id' onclick="${clickHandler}>${name}</div>
-    
+    <div id="ex5" onclick="${clickHandler}>${name}</div>
+                   +
     function Person(name) {
       this.name = name;
-      new Templater().processNode('id', this);
+      template('ex5', this);
     }
     Person.prototype = {
       clickHandler: function(ev) {
         console.log('You clicked on ' + this.name);
       }
     };
+                   ↓
+    <div id="ex5" onclick=[joe.clickHandler]>Joe</div>
 
 i.e. DomTemplate automatically binds function calls in the way we wish
 JavaScript had done from day one.
@@ -161,9 +163,7 @@ Something to be aware of:
 
 * Although it looks like we are using DOM level 0 event registration (i.e.
   element.onfoo = somefunc) we are actually using DOM level 2, by stripping
-  off the 'on' prefix and then using addEventListener('foo', ...). This could
-  have an effect for events were case sensitivity is important like DOMFocusIn
-  More testing is needed here.
+  off the 'on' prefix and then using addEventListener('foo', ...).
 
 
 Conditional evaluation (if="${condition}")
@@ -175,10 +175,26 @@ tree. This allows simple if statements.
 
 Example:
 
-    <div><p if="${name}">Hi, ${name}</p></div>
+    <div id="ex6">
+      <p if="${name}">Hi, ${name}</p>
+    </div>
+                   +
+    templater('ex6', { name: 'Fred' });
+                   ↓
+    <div id="ex6">
+      <p>Hi, Fred</p>
+    </div>
 
-    templater.processNode(..., { name: 'Fred' }); // <div><p>Hi, Fred</p></div>
-    templater.processNode(..., { });              // <div></div>
+However:
+
+    <div id="ex6">
+      <p if="${name}">Hi, ${name}</p>
+    </div>
+                   +
+    templater('ex6', { name: null });
+                   ↓
+    <div id="ex6">
+    </div>
 
 In the second example, the entire 'p' element has been removed by processing
 the if attribute.
@@ -193,9 +209,15 @@ attribute value.
 
 Example:
 
-    <div id="id" foreach="index in ${[ 1, 2, 3 ]}">${index}</div>
-    
-    templater.processNode('id'); // <div>1</div><div>2</div><div>3</div>
+    <div id="ex7">
+      <span foreach="index in ${array}">${index}</span>
+    </div>
+                   +
+    templater('ex7', { array: [ 1, 2, 3 ] });
+                   ↓
+    <div id="ex7">
+      <span>1</span><span>2</span><span>3</span>
+    </div>
 
 If you wish to create a number of elements for each member of the array, then
 you can use a special <loop> element. This will be removed from the resulting
@@ -203,31 +225,40 @@ tree.
 
 Or a more complex example:
 
-    <table id="id" foreach="person in ${people}">
-      <loop>
-        <tr>
-          <td>${person.firstname}
-          <td>${person.surname}
-        </tr>
-        <tr>
-          <td colspan=2>${person.address}
-        </tr>
+    <div id="ex8">
+      <loop foreach="person in ${people}">
+        <h1>${person.name}</h2>
+        <p>${person.address}</p>
       </loop>
-    </table>
-    
+    </div>
+                   +
     var data = {
       people: [
-        { firstname: 'Miss', surname: 'Marple', address: 'St Mary Mead' },
-        { firstname: 'Sherlock', surname: 'Holmes', address: '221B Baker St' },
-        { firstname: 'Hercule', surname: 'Poirot', address: 'Apt 56B' },
+        { name: 'Miss Marple', address: 'St Mary Mead' },
+        { name: 'Sherlock Holmes', address: '221B Baker St' },
+        { name: 'Hercule Poirot', address: 'Whitehaven Mansions' }
       ]
     };
-    
-    templater.processNode('id', data);
-    // Produces the predictable table with 2 rows per sleuth.
+    templater('id', data);
+                   ↓
+    <div id="ex8">
+      <h1>Miss Marple</h2>
+      <p>St Mary Mead</p>
+      <h1>Sherlock Holmes</h2>
+      <p>221B Baker St</p>
+      <h1>Hercule Poirot</h2>
+      <p>Whitehaven Mansions</p>
+    </div>
 
 The foreach element can be used with arrays or objects. If an object is used
 then we will iterate over the enumerable property names.
+
+2 things to be aware of when using ``foreach``, one obvious, the other not so:
+
+* Any ``id`` attributes in the duplicated data, will be duplicated, this is
+  probably not what you want. Avoid using id inside an element with a foreach.
+* <table> element are very picky about what they contain, specifically, <loop>s
+  in places the HTML parser doesn't expect can be pushed to after the table.
 
 
 Getting references to cloned nodes (save="${element}")
@@ -239,46 +270,21 @@ path to an element to set.
 
 This is useful whenever you need to work with the created nodes.
 
-    <div foreach="person in ${people}">
-      <div save="${person.nameElement}>${person.firstname}</div>
+    <div id="ex9">
+      <div save="${element}>${name}</div>
     </div>
-    
-    templater.processNode('id', data); // data as above
-    console.log(people[1].nameElement.innerHTML);  // "Sherlock";
+                   +
+    var data = { name: 'Fred' };
+    templater('ex9', data);
+    console.log(data.element.innerHTML); // "Fred"
+                   ↓
+    <div id="ex9">
+      <div>Fred</div>
+    </div>
 
 
-Grabbing the current node (${__element})
-----------------------------------------
-
-During templating you may need to get access to the current element.
-Sometimes there's just no nice way to describe what you need to do, so the
-__element tracks the element that is under examination.
-
-For example:
-
-    <div id="foo" class="bar">${console.log(__element.className)}</div>
-
-    templater.processNode('foo'); // logs 'bar' to the console.
-
-Slightly less contrived, this could be used when the data might need to be
-fetched asynchronously:
-
-    <div id="id">${loadData(__element)}</div>
-    
-    var data;
-    templater.processNode('id', {
-      loadData: function(element) {
-        if (data) return data;
-        fetchData(function(reply) {
-          data = reply;
-          element.innerHTML = data;
-        });
-      }
-    });
-
-
-Hidden nodes (_src="${...}")
-----------------------------
+Hidden attributes (_src="${...}")
+---------------------------------
 
 Since DomTemplate uses pre-existing DOM elements, there could be attributes that
 the browser will try to use before templating, and will discover invalid values.
@@ -304,4 +310,46 @@ Should you wish to have an attribute in the resulting document prefixed with an
 underscore, simply begin your attribute name with 2 underscores. (Is this a
 common scenario? If you know of another scenario where attribute names are
 prefixed with _, please contact me.
+
+
+Asynchronous Templates
+----------------------
+
+What if the data for the template isn't available when the template is run?
+DomTemplate checks returned data for a 'then' function, and assumes that it's
+a promise which needs resolving before use.
+
+For example:
+
+    <div id="ex10">${name}</div>
+                   +
+    var p = new Promise();
+    templater('ex10', { name: p });
+                   ↓
+    <div id="ex10"><span/></div>
+                   ↓
+    p.resolve("Joe");
+                   ↓
+    <div id="ex10">Joe</div>
+
+
+Grabbing the current node (${__element})
+----------------------------------------
+
+During templating you may need to get access to the current element.
+Sometimes there's just no nice way to describe what you need to do, so the
+__element tracks the element that is under examination.
+
+For example:
+
+    <div id="ex10" class="bar">${console.log(__element.className)}</div>
+                   +
+    templater('ex10', null, { allowEval: true });
+    // logs 'bar' to the console.
+                   ↓
+    <div id="ex10" class="bar"></div>
+
+This technique had been largely superseded by asynchronous templates, and may
+be removed in future. If you have a strong use for it please tell us to prevent
+it from being removed.
 
