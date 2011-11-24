@@ -257,8 +257,9 @@ then we will iterate over the enumerable property names.
 
 * Any ``id`` attributes in the duplicated data, will be duplicated, this is
   probably not what you want. Avoid using id inside an element with a foreach.
-* <table> element are very picky about what they contain, specifically, <loop>s
-  in places the HTML parser doesn't expect can be pushed to after the table.
+* ``<table>`` element are very picky about what they contain, specifically,
+  ``<loop>``s in places the HTML parser doesn't expect can be pushed to after
+  the table.
 
 
 Getting references to cloned nodes (``save="${element}"``)
