@@ -23,9 +23,9 @@ developer tools, so it should be well supported.
 See below for full usage. However if all you need is a taste:
 
     <div id="ex1">${contents}</div>
-                   +
+        +
     template('ex2', { contents:'world' });
-                   ↓
+        ↓
     <div id="ex1">world</div>
 
 DomTemplate can be run on the server on the server in NodeJS using [jsdom]
@@ -34,14 +34,14 @@ DomTemplate can be run on the server on the server in NodeJS using [jsdom]
 DomTemplate engine has a number of features to help applying arbitrary data to
 your page:
 
-* Nested data and arbitrary Javascript (${a.b.c})
-* Registration of event handlers (onClick="${function}")
-* Conditional evaluation (if="${condition}")
-* Looping (loop and foreach="page in ${pages}")
-* Getting references to cloned nodes (save="${element}")
-* Hidden attributes (_src="${...}")
+* Nested data and arbitrary Javascript (``${a.b.c}``)
+* Registration of event handlers (``onclick="${function}"``)
+* Conditional evaluation (``if="${condition}"``)
+* Looping (``<loop>`` and ``foreach="page in ${pages}"``)
+* Getting references to cloned nodes (``save="${element}"``)
+* Hidden attributes (``_src="${...}"``)
 * Asynchronous Templates
-* Grabbing the current node (${__element})
+* Grabbing the current node (``${__element}``)
 
 Things to be wary of:
 
@@ -75,8 +75,8 @@ Where:
 The return value is the Templater object used to process the template.
 
 
-Nested data and arbitrary Javascript (${a.b.c})
------------------------------------------------
+Nested data and arbitrary Javascript (``${a.b.c}``)
+---------------------------------------------------
 
 ``${...}`` blocks can be in attribute values and in HTML content. When used in
 an attribute value, the retrieved data is converted to a string before being
@@ -90,9 +90,9 @@ The data passed to the template can contain nested data, which is then accessed
 using a familiar property path:
 
     <div id="ex2">${a.b.c}</div>
-                   +
+        +
     template('ex2', { a: { b: { c: 42 } });
-                   ↓
+        ↓
     <div id="ex2">42</div>
 
 Normally any ${} element will be processed as a property path (that is a set of
@@ -102,17 +102,17 @@ JavaScript inside ``${}``, when the ``{ allowEval:true }`` option is used.
 As an example, this is possible
 
     <div id="ex3">${console.log('hi'); document.createTextNode('BANG!')}</div>
-                   +
+        +
     template('ex2', null, { allowEval:true });
-                   ↓
+        ↓
     <div id="ex2">BANG!</div>
 
 In the real world doing this kind of thing often leads to pain down the road,
 however it can be a useful get-out-of-jail-free card.
 
 
-Registration of event handlers (onClick="${function}")
-------------------------------------------------------
+Registration of event handlers (``onclick="${function}"``)
+----------------------------------------------------------
 
 Events are registered using event handlers in a way that is similar to normal
 HTML event registration. All you need is the ${...} clause to point to a
@@ -121,13 +121,13 @@ function.
 Example:
 
     <div id="ex4" onclick="${clickHandler}>Hello</div>
-                   +
+        +
     template('ex4', {
       clickHandler:function(ev) {
         console.log('div clicked');
       }
     });
-                   ↓
+        ↓
     <div id="ex4" onclick=[the clickHandler function]>Hello</div>
 
 Here we are registering an onClick handler for the div. Any type of event
@@ -138,7 +138,7 @@ engine. We make sure that the context of the function is the object that called
 it, so you have access to all your data:
 
     <div id="ex5" onclick="${clickHandler}>${name}</div>
-                   +
+        +
     function Person(name) {
       this.name = name;
       template('ex5', this);
@@ -148,7 +148,7 @@ it, so you have access to all your data:
         console.log('You clicked on ' + this.name);
       }
     };
-                   ↓
+        ↓
     <div id="ex5" onclick=[joe.clickHandler]>Joe</div>
 
 i.e. DomTemplate automatically binds function calls in the way we wish
@@ -166,8 +166,8 @@ Something to be aware of:
   off the 'on' prefix and then using addEventListener('foo', ...).
 
 
-Conditional evaluation (if="${condition}")
-------------------------------------------
+Conditional evaluation (``if="${condition}"``)
+----------------------------------------------
 
 If an element contains an 'if' attribute, then its value will be evaluated and
 if the result is 'falsey', then the entire element will be removed from the
@@ -178,9 +178,9 @@ Example:
     <div id="ex6">
       <p if="${name}">Hi, ${name}</p>
     </div>
-                   +
+        +
     templater('ex6', { name: 'Fred' });
-                   ↓
+        ↓
     <div id="ex6">
       <p>Hi, Fred</p>
     </div>
@@ -190,9 +190,9 @@ However:
     <div id="ex6">
       <p if="${name}">Hi, ${name}</p>
     </div>
-                   +
+        +
     templater('ex6', { name: null });
-                   ↓
+        ↓
     <div id="ex6">
     </div>
 
@@ -200,8 +200,8 @@ In the second example, the entire 'p' element has been removed by processing
 the if attribute.
 
 
-Looping (loop and foreach="page in ${pages}")
------------------------------------------------
+Looping (``<loop>`` and ``foreach="page in ${pages}"``)
+-------------------------------------------------------
 
 If an element contains a `foreach` attribute, then that element will be repeated
 in the final document once for each member of the array returned by the
@@ -212,9 +212,9 @@ Example:
     <div id="ex7">
       <span foreach="index in ${array}">${index}</span>
     </div>
-                   +
+        +
     templater('ex7', { array: [ 1, 2, 3 ] });
-                   ↓
+        ↓
     <div id="ex7">
       <span>1</span><span>2</span><span>3</span>
     </div>
@@ -231,7 +231,7 @@ Or a more complex example:
         <p>${person.address}</p>
       </loop>
     </div>
-                   +
+        +
     var data = {
       people: [
         { name: 'Miss Marple', address: 'St Mary Mead' },
@@ -240,7 +240,7 @@ Or a more complex example:
       ]
     };
     templater('id', data);
-                   ↓
+        ↓
     <div id="ex8">
       <h1>Miss Marple</h2>
       <p>St Mary Mead</p>
@@ -261,8 +261,8 @@ then we will iterate over the enumerable property names.
   in places the HTML parser doesn't expect can be pushed to after the table.
 
 
-Getting references to cloned nodes (save="${element}")
-------------------------------------------------------
+Getting references to cloned nodes (``save="${element}"``)
+----------------------------------------------------------
 
 The save attribute is special. It takes the current node at sets it into the
 pointed to structure. In this case ${} is not arbitrary Javascript but a dot
@@ -273,18 +273,18 @@ This is useful whenever you need to work with the created nodes.
     <div id="ex9">
       <div save="${element}>${name}</div>
     </div>
-                   +
+        +
     var data = { name: 'Fred' };
     templater('ex9', data);
     console.log(data.element.innerHTML); // "Fred"
-                   ↓
+        ↓
     <div id="ex9">
       <div>Fred</div>
     </div>
 
 
-Hidden attributes (_src="${...}")
----------------------------------
+Hidden attributes (``_src="${...}"``)
+-------------------------------------
 
 Since DomTemplate uses pre-existing DOM elements, there could be attributes that
 the browser will try to use before templating, and will discover invalid values.
@@ -309,7 +309,7 @@ the correct path has been specified, do the following
 Should you wish to have an attribute in the resulting document prefixed with an
 underscore, simply begin your attribute name with 2 underscores. (Is this a
 common scenario? If you know of another scenario where attribute names are
-prefixed with _, please contact me.
+prefixed with _, please contact me.)
 
 
 Asynchronous Templates
@@ -322,19 +322,19 @@ a promise which needs resolving before use.
 For example:
 
     <div id="ex10">${name}</div>
-                   +
+        +
     var p = new Promise();
     templater('ex10', { name: p });
-                   ↓
+        ↓
     <div id="ex10"><span/></div>
-                   ↓
+        ↓
     p.resolve("Joe");
-                   ↓
+        ↓
     <div id="ex10">Joe</div>
 
 
-Grabbing the current node (${__element})
-----------------------------------------
+Grabbing the current node (``${__element}``)
+--------------------------------------------
 
 During templating you may need to get access to the current element.
 Sometimes there's just no nice way to describe what you need to do, so the
@@ -342,12 +342,12 @@ __element tracks the element that is under examination.
 
 For example:
 
-    <div id="ex10" class="bar">${console.log(__element.className)}</div>
-                   +
-    templater('ex10', null, { allowEval: true });
+    <div id="ex11" class="bar">${console.log(__element.className)}</div>
+        +
+    templater('ex11', null, { allowEval: true });
     // logs 'bar' to the console.
-                   ↓
-    <div id="ex10" class="bar"></div>
+        ↓
+    <div id="ex11" class="bar"></div>
 
 This technique had been largely superseded by asynchronous templates, and may
 be removed in future. If you have a strong use for it please tell us to prevent
