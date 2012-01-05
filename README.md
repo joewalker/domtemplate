@@ -1,4 +1,3 @@
-
 About DomTemplate
 =================
 
@@ -141,13 +140,17 @@ it, so you have access to all your data:
         +
     function Person(name) {
       this.name = name;
-      template('ex5', this);
     }
     Person.prototype = {
+      display: function() {
+        template('ex5', this);
+      },
       clickHandler: function(ev) {
         console.log('You clicked on ' + this.name);
       }
     };
+    var joe = new Person('Joe');
+    joe.display();
         ↓
     <div id="ex5" onclick=[joe.clickHandler]>Joe</div>
 
