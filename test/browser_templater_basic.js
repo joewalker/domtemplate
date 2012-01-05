@@ -6,18 +6,20 @@
 Cu.import("resource:///modules/devtools/Templater.jsm");
 Cu.import("resource:///modules/devtools/Promise.jsm");
 
-function test()
-{
+function test() {
   waitForExplicitFinish();
   addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html");
   browser.addEventListener("load", tabLoaded, true);
 }
 
-function tabLoaded()
-{
+function tabLoaded() {
   browser.removeEventListener("load", tabLoaded, true);
   info("Starting DOM Templater Tests");
   runTest(0);
+}
+
+function executeSoon(func) {
+  setTimeout(func, 200);
 }
 
 function runTest(index) {
@@ -62,7 +64,7 @@ function runTest(index) {
       }.bind(this);
     }
 
-    setTimeout(createTester(holder, options), 200);
+    executeSoon(createTester(holder, options));
   }
   else {
     runNextTest();
