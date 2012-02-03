@@ -244,6 +244,23 @@ var tests = [
     name: 'propertyFail',
     template: '<p>${Math.max(1, 2)}</p>',
     result: '<p>${Math.max(1, 2)}</p>'
+  };},
+
+  // Bug 723431: DOMTemplate should allow customisation of display of
+  // null/undefined values
+  function() { return {
+    name: 'propertyFail',
+    template: '<p>${nullvar}|${undefinedvar1}|${undefinedvar2}</p>',
+    data: { nullvar: null, undefinedvar1: undefined },
+    result: '<p>null|undefined|undefined</p>'
+  };},
+
+  function() { return {
+    name: 'propertyFail',
+    template: '<p>${nullvar}|${undefinedvar1}|${undefinedvar2}</p>',
+    data: { nullvar: null, undefinedvar1: undefined },
+    options: { blankNullUndefined: true },
+    result: '<p>||</p>'
   };}
 ];
 
