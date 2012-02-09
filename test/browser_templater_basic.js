@@ -7,19 +7,10 @@ Cu.import("resource:///modules/devtools/Templater.jsm");
 Cu.import("resource:///modules/devtools/Promise.jsm");
 
 function test() {
-  waitForExplicitFinish();
-  addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html");
-  browser.addEventListener("load", tabLoaded, true);
-}
-
-function tabLoaded() {
-  browser.removeEventListener("load", tabLoaded, true);
-  info("Starting DOM Templater Tests");
-  runTest(0);
-}
-
-function executeSoon(func) {
-  setTimeout(func, 200);
+  addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html", function() {
+    info("Starting DOM Templater Tests");
+    runTest(0);
+  });
 }
 
 function runTest(index) {
