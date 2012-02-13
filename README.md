@@ -70,6 +70,13 @@ Where:
   * _allowEval_ Allow arbitrary JavaScript inside ``${...}`` blocks in addition
     to property paths. Allowing use of eval() can significantly slow down
     JavaScript processing.
+  * _blankNullUndefined_ Output null or undefined values as empty strings
+    rather than the values 'null' or 'undefined'.
+  * _stack_ domtemplate maintains a 'stack' of the nodes it is processing which
+    can help in debugging. The stack option allows you to 'pre-load' the stack.
+    It can be specified either as a string for a single frame, or an array of
+    strings for multiple frames. This is most useful to specify the template
+    name, or usage location.
 
 The return value is the Templater object used to process the template.
 
