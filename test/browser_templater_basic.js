@@ -23,7 +23,8 @@ function test() {
 }
 
 function runTest(index) {
-  var options = tests[index] = tests[index]();
+  var promises = [];
+  var options = tests[index] = tests[index](promises);
   var holder = content.document.createElement('div');
   holder.id = options.name;
   var body = content.document.body;
@@ -64,7 +65,8 @@ function runTest(index) {
       }.bind(this);
     }
 
-    executeSoon(createTester(holder, options));
+    var promise = imports.Promise.group(promises);
+    promise.then(createTester(holder, options));
   }
   else {
     runNextTest();
@@ -142,10 +144,10 @@ var tests = [
 
   // Bug 692028: DOMTemplate memory leak with asynchronous arrays
   // Bug 692031: DOMTemplate async loops do not drop the loop element
-  function() { return {
+  function(promises) { return {
     name: 'asyncLoopElement',
     template: '<loop foreach="i in ${array}">${i}</loop>',
-    data: { array: delayReply([1, 2, 3]) },
+    data: { array: delayReply([1, 2, 3], promises) },
     result: '<span></span>',
     later: '123'
   };},
@@ -174,41 +176,47 @@ var tests = [
     result: '<p id="pass9">pass 9b</p>'
   };},
 
-  function() { return {
+  function(promises) { return {
     name: 'asyncInline',
     template: '${delayed}',
-    data: { delayed: delayReply('inline') },
+    data: { delayed: delayReply('inline', promises) },
     result: '<span></span>',
     later: 'inline'
   };},
 
   // Bug 692028: DOMTemplate memory leak with asynchronous arrays
-  function() { return {
+  function(promises) { return {
     name: 'asyncArray',
     template: '<p foreach="i in ${delayed}">${i}</p>',
-    data: { delayed: delayReply([1, 2, 3]) },
+    data: { delayed: delayReply([1, 2, 3], promises) },
     result: '<span></span>',
     later: '<p>1</p><p>2</p><p>3</p>'
   };},
 
-  function() { return {
+  function(promises) { return {
     name: 'asyncMember',
     template: '<p foreach="i in ${delayed}">${i}</p>',
-    data: { delayed: [delayReply(4), delayReply(5), delayReply(6)] },
+    data: {
+      delayed: [
+        delayReply(4, promises),
+        delayReply(5, promises),
+        delayReply(6, promises)
+      ]
+    },
     result: '<span></span><span></span><span></span>',
     later: '<p>4</p><p>5</p><p>6</p>'
   };},
 
   // Bug 692028: DOMTemplate memory leak with asynchronous arrays
-  function() { return {
+  function(promises) { return {
     name: 'asyncBoth',
     template: '<p foreach="i in ${delayed}">${i}</p>',
     data: {
       delayed: delayReply([
-        delayReply(4),
-        delayReply(5),
-        delayReply(6)
-      ])
+        delayReply(4, promises),
+        delayReply(5, promises),
+        delayReply(6, promises)
+      ], promises)
     },
     result: '<span></span>',
     later: '<p>4</p><p>5</p><p>6</p>'
@@ -246,7 +254,7 @@ var tests = [
     result: '<p>${Math.max(1, 2)}</p>'
   };},
 
-  // Bug 723431: DOMTemplate should allow customisation of display of
+  // Bug 723431: DOMTemplate should allow customization of display of
   // null/undefined values
   function() { return {
     name: 'propertyUndefAttrFull',
@@ -279,10 +287,11 @@ var tests = [
   };}
 ];
 
-function delayReply(data) {
+function delayReply(data, promises) {
   var p = new imports.Promise();
   executeSoon(function() {
     p.resolve(data);
   });
+  promises.push(p);
   return p;
 }

@@ -116,18 +116,18 @@ var laterGroup;
 
 function testChain() {
   // Test an empty group
-  var empty1 = Promise.group();
+  var empty1 = imports.Promise.group();
   ok(!empty1.isRejected(), "empty1 Promise is unrejected");
 
   // Test a group with no members
-  var empty2 = Promise.group([]);
+  var empty2 = imports.Promise.group([]);
   ok(!empty2.isRejected(), "empty2 Promise is unrejected");
 
   // Test grouping using resolve() in a later context
   member1 = new imports.Promise();
   member2 = new imports.Promise();
   member3 = new imports.Promise();
-  laterGroup = Promise.group(member1, member2, member3);
+  laterGroup = imports.Promise.group(member1, member2, member3);
   laterGroup.then(testLaterGroup, fail);
 
   member1.then(function(data) {
@@ -163,7 +163,7 @@ function testLaterGroup(data) {
   ok(!laterGroup.isRejected(), "laterGroup Promise is unrejected");
 
   // Test grouping resolve() *before* then() in the same context
-  tidyGroup = Promise.group([
+  tidyGroup = imports.Promise.group([
     postResolution, preResolution, laterResolution,
     member1, member2, member3, laterGroup
   ]);
@@ -184,7 +184,7 @@ function testTidyGroup(data) {
   ok(!tidyGroup.isRejected(), "tidyGroup Promise is unrejected");
 
   // Test grouping resolve() *before* then() in the same context
-  failGroup = Promise.group(postResolution, laterRejection);
+  failGroup = imports.Promise.group(postResolution, laterRejection);
   failGroup.then(fail, testFailGroup);
 }
 
@@ -204,7 +204,7 @@ function testFailGroup(data) {
 }
 
 function testTrap() {
-  var p = new Promise();
+  var p = new imports.Promise();
   var message = "Expected exception";
   p.chainPromise(
     function() {
@@ -225,7 +225,7 @@ function testTrap() {
 function testAlways() {
   var shouldbeTrue1 = false;
   var shouldbeTrue2 = false;
-  var p = new Promise();
+  var p = new imports.Promise();
   p.chainPromise(
     function() {
       throw new Error();
@@ -265,6 +265,7 @@ function testAlways() {
 }
 
 function fail() {
+  imports = undefined;
   gBrowser.removeCurrentTab();
   info("Failed Promise Tests");
   ok(false, "fail called");
@@ -272,6 +273,7 @@ function fail() {
 }
 
 function finished() {
+  imports = undefined;
   gBrowser.removeCurrentTab();
   info("Finishing Promise Tests");
   finish();
