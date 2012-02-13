@@ -3,8 +3,17 @@
 
 // Tests that the DOM Template engine works properly
 
-Cu.import("resource:///modules/devtools/Templater.jsm");
-Cu.import("resource:///modules/devtools/Promise.jsm");
+/*
+ * These tests run both in Mozilla/Mochitest and plain browsers (as does
+ * domtemplate)
+ * We should endeavor to keep the source in sync. Ask author for details
+ *
+ * Author: Joe Walker <jwalker@mozilla.com>
+ */
+
+var imports = {};
+Cu.import("resource:///modules/devtools/Templater.jsm", imports);
+Cu.import("resource:///modules/devtools/Promise.jsm", imports);
 
 function test() {
   addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html", function() {
@@ -22,7 +31,7 @@ function runTest(index) {
   holder.innerHTML = options.template;
 
   info('Running ' + options.name);
-  template(holder, options.data, options.options);
+  imports.template(holder, options.data, options.options);
 
   if (typeof options.result == 'string') {
     is(holder.innerHTML, options.result, options.name);
@@ -240,14 +249,14 @@ var tests = [
   // Bug 723431: DOMTemplate should allow customisation of display of
   // null/undefined values
   function() { return {
-    name: 'propertyFail',
+    name: 'propertyUndefAttrFull',
     template: '<p>${nullvar}|${undefinedvar1}|${undefinedvar2}</p>',
     data: { nullvar: null, undefinedvar1: undefined },
     result: '<p>null|undefined|undefined</p>'
   };},
 
   function() { return {
-    name: 'propertyFail',
+    name: 'propertyUndefAttrBlank',
     template: '<p>${nullvar}|${undefinedvar1}|${undefinedvar2}</p>',
     data: { nullvar: null, undefinedvar1: undefined },
     options: { blankNullUndefined: true },
@@ -271,7 +280,7 @@ var tests = [
 ];
 
 function delayReply(data) {
-  var p = new Promise();
+  var p = new imports.Promise();
   executeSoon(function() {
     p.resolve(data);
   });

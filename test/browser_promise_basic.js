@@ -3,26 +3,28 @@
 
 // Tests that our Promise implementation works properly
 
-Cu.import("resource:///modules/devtools/Promise.jsm");
+/*
+ * These tests run both in Mozilla/Mochitest and plain browsers (as does
+ * domtemplate)
+ * We should endeavor to keep the source in sync. Ask author for details
+ *
+ * Author: Joe Walker <jwalker@mozilla.com>
+ */
 
-function test()
-{
-  waitForExplicitFinish();
-  addTab("http://example.com/browser/browser/devtools/shared/test/browser_promise_basic.html");
-  browser.addEventListener("load", tabLoaded, true);
-}
+var imports = {};
+Cu.import("resource:///modules/devtools/Promise.jsm", imports);
 
-function tabLoaded()
-{
-  browser.removeEventListener("load", tabLoaded, true);
-  info("Starting Promise Tests");
-  testBasic();
+function test() {
+  addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html", function() {
+    info("Starting Promise Tests");
+    testBasic();
+  });
 }
 
 var postResolution;
 
 function testBasic() {
-  postResolution = new Promise();
+  postResolution = new imports.Promise();
   ok(postResolution.isPromise, "We have a promise");
   ok(!postResolution.isComplete(), "Promise is initially incomplete");
   ok(!postResolution.isResolved(), "Promise is initially unresolved");
@@ -43,16 +45,16 @@ function testPostResolution(data) {
   ok(!postResolution.isRejected(), "postResolution Promise is unrejected");
 
   try {
-    info("Expected double resolve error");
+    info("Expecting double resolve error");
     postResolution.resolve("double resolve");
     ok(false, "double resolve");
   }
   catch (ex) {
-    // Expected
+    info("Got double resolve error");
   }
 
   // Test resolve() *before* then() in the same context
-  preResolution = new Promise();
+  preResolution = new imports.Promise();
   var reply = preResolution.resolve("preResolution")
                            .then(testPreResolution, fail);
   is(reply, preResolution, "return this; working ok");
@@ -67,7 +69,7 @@ function testPreResolution(data) {
   ok(!preResolution.isRejected(), "preResolution Promise is unrejected");
 
   // Test resolve() *after* then() in a later context
-  laterResolution = new Promise();
+  laterResolution = new imports.Promise();
   laterResolution.then(testLaterResolution, fail);
   executeSoon(function() {
     laterResolution.resolve("laterResolution");
@@ -83,7 +85,7 @@ function testLaterResolution(data) {
   ok(!laterResolution.isRejected(), "laterResolution Promise is unrejected");
 
   // Test reject() *after* then() in a later context
-  laterRejection = new Promise().then(fail, testLaterRejection);
+  laterRejection = new imports.Promise().then(fail, testLaterRejection);
   executeSoon(function() {
     laterRejection.reject("laterRejection");
   });
@@ -96,7 +98,7 @@ function testLaterRejection(data) {
   ok(laterRejection.isRejected(), "laterRejection Promise is rejected");
 
   // Test chaining
-  var orig = new Promise();
+  var orig = new imports.Promise();
   orig.chainPromise(function(data) {
     is(data, "origData", "data is origData");
     return data.replace(/orig/, "new");
@@ -126,9 +128,9 @@ function testChain() {
   ok(!empty2.isRejected(), "empty2 Promise is unrejected");
 
   // Test grouping using resolve() in a later context
-  member1 = new Promise();
-  member2 = new Promise();
-  member3 = new Promise();
+  member1 = new imports.Promise();
+  member2 = new imports.Promise();
+  member3 = new imports.Promise();
   laterGroup = Promise.group(member1, member2, member3);
   laterGroup.then(testLaterGroup, fail);
 
