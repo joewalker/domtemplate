@@ -15,7 +15,7 @@ var imports = {};
 Cu.import("resource:///modules/devtools/Promise.jsm", imports);
 
 function test() {
-  addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html", function() {
+  addTab("about:blank", function() {
     info("Starting Promise Tests");
     testBasic();
   });
@@ -117,14 +117,10 @@ var laterGroup;
 function testChain() {
   // Test an empty group
   var empty1 = Promise.group();
-  ok(empty1.isComplete(), "empty1 Promise is complete");
-  ok(empty1.isResolved(), "empty1 Promise is resolved");
   ok(!empty1.isRejected(), "empty1 Promise is unrejected");
 
   // Test a group with no members
   var empty2 = Promise.group([]);
-  ok(empty2.isComplete(), "empty2 Promise is complete");
-  ok(empty2.isResolved(), "empty2 Promise is resolved");
   ok(!empty2.isRejected(), "empty2 Promise is unrejected");
 
   // Test grouping using resolve() in a later context
@@ -204,7 +200,68 @@ function testFailGroup(data) {
   laterGroup = undefined;
   laterRejection = undefined;
 
-  finished();
+  testTrap();
+}
+
+function testTrap() {
+  var p = new Promise();
+  var message = "Expected exception";
+  p.chainPromise(
+    function() {
+      throw new Error(message);
+    }).trap(
+      function(aError) {
+        is(aError instanceof Error, true, "trap received exception");
+        is(aError.message, message, "trap received correct exception");
+        return 1;
+      }).chainPromise(
+        function(aResult) {
+          is(aResult, 1, "trap restored correct result");
+          testAlways();
+        });
+  p.resolve();
+}
+
+function testAlways() {
+  var shouldbeTrue1 = false;
+  var shouldbeTrue2 = false;
+  var p = new Promise();
+  p.chainPromise(
+    function() {
+      throw new Error();
+    }
+  ).chainPromise(//Promise rejected, should not be executed
+    function() {
+      ok(false, "This should not be executed");
+    }
+  ).always(
+    function(x) {
+      shouldbeTrue1 = true;
+      return "random value";
+    }
+  ).trap(
+    function(arg) {
+      ok((arg instanceof Error), "The random value should be ignored");
+      return 1;//We should still have this result later
+    }
+  ).trap(
+    function() {
+      ok(false, "This should not be executed 2");
+    }
+  ).always(
+    function() {
+      shouldbeTrue2 = true;
+    }
+  ).then(
+    function(aResult){
+      ok(shouldbeTrue1, "First always must be executed");
+      ok(shouldbeTrue2, "Second always must be executed");
+      is(aResult, 1, "Result should be unaffected by always");
+
+      finished();
+    }
+  );
+  p.resolve();
 }
 
 function fail() {
