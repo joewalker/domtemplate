@@ -36,13 +36,9 @@ function is(actual, expected, name) {
   }
 }
 
-function ok(test, name) {
-  console.assert(test, name);
-}
+var ok = console.assert.bind(console);
 
-function info(message) {
-  console.log(message);
-}
+var info = console.log.bind(console);
 
 function executeSoon(action) {
   setTimeout(action, 1);
