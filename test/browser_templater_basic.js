@@ -252,6 +252,21 @@ var tests = [
     data: { nullvar: null, undefinedvar1: undefined },
     options: { blankNullUndefined: true },
     result: '<p>||</p>'
+  };},
+
+  function() { return {
+    name: 'propertyUndefAttrFull',
+    template: '<div><p value="${nullvar}"></p><p value="${undefinedvar1}"></p><p value="${undefinedvar2}"></p></div>',
+    data: { nullvar: null, undefinedvar1: undefined },
+    result: '<div><p value="null"></p><p value="undefined"></p><p value="undefined"></p></div>'
+  };},
+
+  function() { return {
+    name: 'propertyUndefAttrBlank',
+    template: '<div><p value="${nullvar}"></p><p value="${undefinedvar1}"></p><p value="${undefinedvar2}"></p></div>',
+    data: { nullvar: null, undefinedvar1: undefined },
+    options: { blankNullUndefined: true },
+    result: '<div><p value=""></p><p value=""></p><p value=""></p></div>'
   };}
 ];
 
