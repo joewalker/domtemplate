@@ -23,7 +23,7 @@ See below for full usage. However if all you need is a taste:
 
     <div id="ex1">${contents}</div>
         +
-    template('ex2', { contents:'world' });
+    template('ex1', { contents:'world' });
         ↓
     <div id="ex1">world</div>
 
@@ -109,9 +109,9 @@ As an example, this is possible
 
     <div id="ex3">${console.log('hi'); document.createTextNode('BANG!')}</div>
         +
-    template('ex2', null, { allowEval:true });
+    template('ex3', null, { allowEval:true });
         ↓
-    <div id="ex2">BANG!</div>
+    <div id="ex3">BANG!</div>
 
 In the real world doing this kind of thing often leads to pain down the road,
 however it can be a useful get-out-of-jail-free card.
