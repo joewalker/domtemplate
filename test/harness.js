@@ -36,7 +36,11 @@ function is(actual, expected, name) {
   }
 }
 
-var ok = console.assert.bind(console);
+function ok(test, name) {
+  if (test !== true) {
+    console.error('Assertion fail: ' + name);
+  }
+}
 
 var info = console.log.bind(console);
 
