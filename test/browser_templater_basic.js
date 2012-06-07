@@ -284,6 +284,21 @@ var tests = [
     data: { nullvar: null, undefinedvar1: undefined },
     options: { blankNullUndefined: true },
     result: '<div><p value=""></p><p value=""></p><p value=""></p></div>'
+  };},
+
+  // Bug 762673 - DOMTemplate should support DOM-level 0 events
+  function() { return {
+    name: 'dom0event1',
+    template: '<div onclick="alert(\'${name}\');"></div>',
+    data: { name: 'fred' },
+    result: '<div onclick="alert(\'fred\');"></div>'
+  };},
+
+  function() { return {
+    name: 'dom0event2',
+    template: '<div onclick="${name}"></div>',
+    data: { name: 'alert(\'fred\');' },
+    result: '<div onclick="alert(\'fred\');"></div>'
   };}
 ];
 
