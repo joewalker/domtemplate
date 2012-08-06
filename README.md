@@ -26,6 +26,8 @@ See below for full usage. However if all you need is a taste:
     template('ex1', { contents:'world' });
         ↓
     <div id="ex1">world</div>
+[Try it...](http://jsfiddle.net/dcCK5/)  
+
 
 DomTemplate can be run on the server on the server in NodeJS using [jsdom]
 (https://github.com/tmpvar/jsdom).
@@ -97,9 +99,10 @@ using a familiar property path:
 
     <div id="ex2">${a.b.c}</div>
         +
-    template('ex2', { a: { b: { c: 42 } });
+    template('ex2', { a: { b: { c: 42 } } } );
         ↓
     <div id="ex2">42</div>
+[Try it...](http://jsfiddle.net/dcCK5/1/)  
 
 Normally any ${} element will be processed as a property path (that is a set of
 properties separated by '.') However DomTemplate also supports using arbitrary
@@ -112,6 +115,7 @@ As an example, this is possible
     template('ex3', null, { allowEval:true });
         ↓
     <div id="ex3">BANG!</div>
+[Try it...](http://jsfiddle.net/dcCK5/2/)  
 
 In the real world doing this kind of thing often leads to pain down the road,
 however it can be a useful get-out-of-jail-free card.
@@ -126,7 +130,7 @@ function.
 
 Example:
 
-    <div id="ex4" onclick="${clickHandler}>Hello</div>
+    <div id="ex4" onclick="${clickHandler}">Hello</div>​
         +
     template('ex4', {
       clickHandler:function(ev) {
@@ -135,15 +139,16 @@ Example:
     });
         ↓
     <div id="ex4" onclick=[the clickHandler function]>Hello</div>
+[Try it...](http://jsfiddle.net/dcCK5/3/)  
 
 Here we are registering an onClick handler for the div. Any type of event
 handler can be registered.
 
 This is particularly handy when `this` is used as the data to the template
-engine. We make sure that the context of the function is the object that called
+engine. We make sure that the context of the function is the object that called 
 it, so you have access to all your data:
 
-    <div id="ex5" onclick="${clickHandler}>${name}</div>
+    <div id="ex5" onclick="${clickHandler}">${name}</div>
         +
     function Person(name) {
       this.name = name;
@@ -160,6 +165,7 @@ it, so you have access to all your data:
     joe.display();
         ↓
     <div id="ex5" onclick=[joe.clickHandler]>Joe</div>
+[Try it...](http://jsfiddle.net/dcCK5/4/)
 
 i.e. DomTemplate automatically binds function calls in the way we wish
 JavaScript had done from day one.
@@ -189,11 +195,12 @@ Example:
       <p if="${name}">Hi, ${name}</p>
     </div>
         +
-    templater('ex6', { name: 'Fred' });
+    template('ex6', { name: 'Fred' });
         ↓
     <div id="ex6">
       <p>Hi, Fred</p>
     </div>
+[Try it...](http://jsfiddle.net/dcCK5/5/)
 
 However:
 
@@ -201,10 +208,11 @@ However:
       <p if="${name}">Hi, ${name}</p>
     </div>
         +
-    templater('ex6', { name: null });
+    template('ex6', { name: null });
         ↓
     <div id="ex6">
     </div>
+[Try it...](http://jsfiddle.net/dcCK5/6/)
 
 In the second example, the entire 'p' element has been removed by processing
 the if attribute.
@@ -223,11 +231,12 @@ Example:
       <span foreach="index in ${array}">${index}</span>
     </div>
         +
-    templater('ex7', { array: [ 1, 2, 3 ] });
+    template('ex7', { array: [ 1, 2, 3 ] });
         ↓
     <div id="ex7">
       <span>1</span><span>2</span><span>3</span>
     </div>
+[Try it...](http://jsfiddle.net/dcCK5/7/)
 
 If you wish to create a number of elements for each member of the array, then
 you can use a special <loop> element. This will be removed from the resulting
@@ -249,7 +258,7 @@ Or a more complex example:
         { name: 'Hercule Poirot', address: 'Whitehaven Mansions' }
       ]
     };
-    templater('id', data);
+    template('ex8', data);
         ↓
     <div id="ex8">
       <h1>Miss Marple</h2>
@@ -259,6 +268,7 @@ Or a more complex example:
       <h1>Hercule Poirot</h2>
       <p>Whitehaven Mansions</p>
     </div>
+[Try it...](http://jsfiddle.net/dcCK5/8/)
 
 The foreach element can be used with arrays or objects. If an object is used
 then we will iterate over the enumerable property names.
@@ -282,16 +292,17 @@ path to an element to set.
 This is useful whenever you need to work with the created nodes.
 
     <div id="ex9">
-      <div save="${element}>${name}</div>
+      <div save="${element}>${name}"</div>
     </div>
         +
     var data = { name: 'Fred' };
-    templater('ex9', data);
+    template('ex9', data);
     console.log(data.element.innerHTML); // "Fred"
         ↓
     <div id="ex9">
       <div>Fred</div>
     </div>
+[Try it...](http://jsfiddle.net/dcCK5/9/)
 
 
 Hidden attributes (``_src="${...}"``)
@@ -335,14 +346,14 @@ For example:
     <div id="ex10">${name}</div>
         +
     var p = new Promise();
-    templater('ex10', { name: p });
+    template('ex10', { name: p });
         ↓
     <div id="ex10"><span/></div>
         ↓
     p.resolve("Joe");
         ↓
     <div id="ex10">Joe</div>
-
+[Try it...](http://jsfiddle.net/dcCK5/10/)
 
 Grabbing the current node (``${__element}``)
 --------------------------------------------
@@ -353,12 +364,13 @@ __element tracks the element that is under examination.
 
 For example:
 
-    <div id="ex11" class="bar">${console.log(__element.className)}</div>
+    <div id="ex11" class="bar">${console.log(__element.className);''}</div>​
         +
-    templater('ex11', null, { allowEval: true });
+    template('ex11', null, { allowEval: true });
     // logs 'bar' to the console.
         ↓
     <div id="ex11" class="bar"></div>
+[Try it...](http://jsfiddle.net/dcCK5/11/)
 
 This technique had been largely superseded by asynchronous templates, and may
 be removed in future. If you have a strong use for it please tell us to prevent
