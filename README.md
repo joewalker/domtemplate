@@ -120,6 +120,10 @@ As an example, this is possible
 In the real world doing this kind of thing often leads to pain down the road,
 however it can be a useful get-out-of-jail-free card.
 
+Normally array subscripting is performed using code like ``redBalloons[99]``,
+however this is not a property script. To subscript an array in a property
+script, you can also do ``redBalloons.99`.
+
 
 Registration of event handlers (``onclick="${function}"``)
 ----------------------------------------------------------
