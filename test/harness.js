@@ -37,7 +37,7 @@ function is(actual, expected, name) {
 }
 
 function ok(test, name) {
-  if (test !== true) {
+  if (!test) {
     console.error('Assertion fail: ' + name);
   }
 }

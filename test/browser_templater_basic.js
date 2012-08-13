@@ -38,7 +38,8 @@ function runTest(index) {
     is(holder.innerHTML, options.result, options.name);
   }
   else {
-    ok(holder.innerHTML.match(options.result), options.name);
+    ok(holder.innerHTML.match(options.result) != null,
+       options.name + ' result=\'' + holder.innerHTML + '\'');
   }
 
   if (options.also) {
@@ -158,7 +159,7 @@ var tests = [
     data: { name: 'pass 8' },
     result: '<p>pass 8</p>',
     also: function(options) {
-      ok(options.data.element.innerHTML, 'pass 9', 'saveElement saved');
+      is(options.data.element.innerHTML, 'pass 8', 'saveElement saved');
       delete options.data.element;
     }
   };},
@@ -170,7 +171,7 @@ var tests = [
     data: {
       adjust: function(element) {
         is('pass9', element.id, 'useElement adjust');
-        return 'pass 9b'
+        return 'pass 9b';
       }
     },
     result: '<p id="pass9">pass 9b</p>'
