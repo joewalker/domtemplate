@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/joewalker/domtemplate.png)](http://travis-ci.org/joewalker/domtemplate)
 About DomTemplate
 =================
 
