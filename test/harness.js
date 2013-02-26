@@ -1,12 +1,6 @@
 
 var Cu = {
   import: function(module, tempScope) {
-    if (typeof template !== 'undefined') {
-      tempScope.template = template;
-    }
-    if (typeof Promise !== 'undefined') {
-      tempScope.Promise = Promise;
-    }
   }
 };
 
@@ -51,3 +45,11 @@ function executeSoon(action) {
 window.addEventListener('load', function() {
   test();
 });
+
+var Promise = {
+  defer: window.loader.defer,
+  reject: window.loader.reject,
+  resolve: window.loader.resolve,
+  promised: window.loader.promised,
+  all: window.loader.promised(Array)
+};

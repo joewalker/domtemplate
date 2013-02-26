@@ -11,9 +11,8 @@
  * Author: Joe Walker <jwalker@mozilla.com>
  */
 
-var imports = {};
-Cu.import("resource:///modules/devtools/Templater.jsm", imports);
-Cu.import("resource:///modules/devtools/Promise.jsm", imports);
+Cu.import("resource:///modules/devtools/Templater.jsm");
+Cu.import("resource://gre/modules/commonjs/sdk/core/promise.js");
 
 function test() {
   addTab("http://example.com/browser/browser/devtools/shared/test/browser_templater_basic.html", function() {
@@ -32,7 +31,7 @@ function runTest(index) {
   holder.innerHTML = options.template;
 
   info('Running ' + options.name);
-  imports.template(holder, options.data, options.options);
+  template(holder, options.data, options.options);
 
   if (typeof options.result == 'string') {
     is(holder.innerHTML, options.result, options.name);
@@ -66,8 +65,7 @@ function runTest(index) {
       }.bind(this);
     }
 
-    var promise = imports.Promise.group(promises);
-    promise.then(createTester(holder, options));
+    Promise.all(promises).then(createTester(holder, options));
   }
   else {
     runNextTest();
@@ -304,10 +302,10 @@ var tests = [
 ];
 
 function delayReply(data, promises) {
-  var p = new imports.Promise();
+  var deferred = Promise.defer();
   executeSoon(function() {
-    p.resolve(data);
+    deferred.resolve(data);
   });
-  promises.push(p);
-  return p;
+  promises.push(deferred.promise);
+  return deferred.promise;
 }
