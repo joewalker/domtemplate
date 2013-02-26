@@ -2,7 +2,7 @@
   "author": "Joe Walker <joe@getahead.org> (http://incompleteness.me/)",
   "name": "domtemplate",
   "description": "DOM Template Library",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "repository": {
     "type": "git",
     "url": "git@github.com:joewalker/domtemplate.git"
